@@ -1,0 +1,15 @@
+export const NAV = [
+  ["/", "Dashboard", "LayoutDashboard"],
+  ["/students", "Students", "GraduationCap"],
+  ["/teachers", "Teachers", "Users"],
+  ["/classes-batches", "Classes & Batches", "Layers"],
+  ["/attendance", "Attendance", "CalendarCheck"],
+  ["/fees-payments", "Fees & Payments", "IndianRupee"],
+  ["/assignments", "Assignments", "FileText"],
+  ["/examinations", "Examinations", "ClipboardList"],
+  ["/ai-automation", "AI Automation", "Sparkles"],
+  ["/parent-communication", "Parent Communication", "MessageCircle"],
+  ["/messages", "Messages", "Mail"],
+  ["/reports", "Reports & Analytics", "BarChart3"],
+  ["/notifications", "Notifications", "Bell"],
+].map(([href, label, icon]) => ({ href, label, icon }));
