@@ -2,7 +2,13 @@ import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Icon from "@/components/ui/Icon";
 import ActionButton from "@/components/ui/ActionButton";
-import { QUICK_ACTIONS } from "@/data/dashboard";
+
+const QUICK_ACTIONS = [
+  { icon: "UserPlus", label: "Add Student" }, { icon: "Layers", label: "Create Batch" },
+  { icon: "CalendarCheck", label: "Mark Attendance" }, { icon: "IndianRupee", label: "Collect Fee" },
+  { icon: "FilePlus", label: "Create Assignment" }, { icon: "ClipboardList", label: "Schedule Exam" },
+  { icon: "Megaphone", label: "Send Announcement" }, { icon: "Sparkles", label: "AI Automation", href: "/ai-automation" },
+];
 
 export default function QuickActions() {
   return (

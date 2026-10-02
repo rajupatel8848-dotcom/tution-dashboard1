@@ -2,13 +2,16 @@
 import { usePathname } from "next/navigation";
 import Icon from "@/components/ui/Icon";
 import { NAV } from "@/data/nav";
+import useApiCollection from "@/components/api/useApiCollection";
 import NotificationsPopover from "./NotificationsPopover";
 import ProfileMenu from "./ProfileMenu";
 
 export default function Topbar({ onMenu }) {
   const pathname = usePathname();
+  const { data: automations, loading, error } = useApiCollection("automations");
   const current = NAV.find((n) => (n.href === "/" ? pathname === "/" : pathname.startsWith(n.href)));
   const title = current?.label ?? "Dashboard";
+  const activeCount = automations.filter((automation) => automation.on).length;
 
   return (
     <header className="top">
@@ -22,7 +25,9 @@ export default function Topbar({ onMenu }) {
         <Icon name="Search" />
         <input placeholder="Search students, fees, classes" aria-label="Global search" />
       </label>
-      <span className="pill hide-s">AI Automation: Active</span>
+      <span className="pill hide-s">
+        {loading ? "Automation status…" : error ? "Automation status unavailable" : `${activeCount} automations active`}
+      </span>
       <NotificationsPopover />
       <ProfileMenu />
     </header>

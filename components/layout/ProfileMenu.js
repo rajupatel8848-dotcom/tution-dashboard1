@@ -1,8 +1,10 @@
 "use client";
 import { useCallback, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Icon from "@/components/ui/Icon";
 import { useConfirm } from "@/components/providers/ConfirmProvider";
 import { useToast } from "@/components/providers/ToastProvider";
+import { apiRequest } from "@/components/api/client";
 import useDismiss from "./useDismiss";
 
 export default function ProfileMenu() {
@@ -11,11 +13,19 @@ export default function ProfileMenu() {
   const close = useCallback(() => setOpen(false), []);
   const confirm = useConfirm();
   const toast = useToast();
+  const router = useRouter();
   useDismiss(ref, close);
 
   const signOut = async () => {
     close();
-    if (await confirm({ title: "Sign out?", text: "You will need to sign in again to access the dashboard." })) toast("Signed out (demo)");
+    if (!(await confirm({ title: "Sign out?", text: "You will need to sign in again to access the dashboard." }))) return;
+    try {
+      await apiRequest("/api/auth/logout", { method: "POST" });
+      router.replace("/login");
+      router.refresh();
+    } catch (error) {
+      toast(error.message);
+    }
   };
 
   return (

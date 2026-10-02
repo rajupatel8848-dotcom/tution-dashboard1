@@ -1,7 +1,10 @@
 /** series: [{ data: number[], color, dashed? }] */
 export default function LineChart({ series, label = "Line chart", W = 560, H = 200, pad = 26 }) {
-  const max = Math.max(...series.flatMap((s) => s.data));
-  const pts = (d) => d.map((v, i) => [pad + (i * (W - 2 * pad)) / (d.length - 1), H - pad - (v / max) * (H - 2 * pad)]);
+  const max = Math.max(1, ...series.flatMap((s) => s.data));
+  const pts = (d) => d.map((v, i) => [
+    d.length === 1 ? W / 2 : pad + (i * (W - 2 * pad)) / (d.length - 1),
+    H - pad - (v / max) * (H - 2 * pad),
+  ]);
   const path = (d) => pts(d).map((p, i) => `${i ? "L" : "M"}${p[0]},${p[1]}`).join("");
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={label}>

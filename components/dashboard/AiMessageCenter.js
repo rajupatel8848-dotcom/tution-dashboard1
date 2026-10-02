@@ -1,19 +1,23 @@
+"use client";
 import Card from "@/components/ui/Card";
 import Icon from "@/components/ui/Icon";
 import ActionButton from "@/components/ui/ActionButton";
-import { AI_MESSAGES } from "@/data/dashboard";
+import ApiStatus from "@/components/api/ApiStatus";
+import useApiCollection from "@/components/api/useApiCollection";
 
 export default function AiMessageCenter() {
+  const { data, loading, error, reload } = useApiCollection("announcements");
   return (
-    <Card title="AI message center" actions={<ActionButton message="Opening all messages">View All Messages</ActionButton>}>
-      <ul className="tl">
-        {AI_MESSAGES.map((m) => (
-          <li key={m.title}>
+    <Card title="Announcements" actions={<ActionButton message="Opening all announcements">View All Messages</ActionButton>}>
+      <ApiStatus loading={loading} error={error} empty={!data.length && !loading && !error} onRetry={reload} />
+      {!loading && !error && data.length > 0 && <ul className="tl">
+        {data.map((m) => (
+          <li key={m.id}>
             <span className="ic"><Icon name="Sparkles" /></span>
-            <div><b>{m.title}</b><div className="muted">{m.text}</div></div>
+            <div><b>{m.title}</b><div className="muted">{m.audience || "Audience not set"} · {m.sent || "Not sent"}</div></div>
           </li>
         ))}
-      </ul>
+      </ul>}
     </Card>
   );
 }

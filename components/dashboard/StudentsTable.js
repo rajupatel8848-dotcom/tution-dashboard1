@@ -7,15 +7,17 @@ import ProgressBar from "@/components/ui/ProgressBar";
 import EmptyState from "@/components/ui/EmptyState";
 import Pagination from "@/components/ui/Pagination";
 import { useToast } from "@/components/providers/ToastProvider";
-import { STUDENTS } from "@/data/students";
+import useApiCollection from "@/components/api/useApiCollection";
+import ApiStatus from "@/components/api/ApiStatus";
 
 export default function StudentsTable({ title = "Recent students", limit }) {
   const toast = useToast();
   const [query, setQuery] = useState("");
+  const { data: students, loading, error, reload } = useApiCollection("students");
   const rows = useMemo(() => {
-    const filtered = STUDENTS.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
+    const filtered = students.filter((s) => (s.name || "").toLowerCase().includes(query.toLowerCase()));
     return limit ? filtered.slice(0, limit) : filtered;
-  }, [query, limit]);
+  }, [students, query, limit]);
 
   const iconBtn = (name, label, student, message) => (
     <button type="button" className="ib" style={{ display: "inline-grid", width: 30, height: 30 }} aria-label={`${label} ${student}`} title={label} onClick={() => toast(message)}>
@@ -42,13 +44,13 @@ export default function StudentsTable({ title = "Recent students", limit }) {
             {rows.map((s) => (
               <tr key={s.id}>
                 <td><b>{s.name}</b></td>
-                <td>{s.cls}</td>
-                <td>{s.parent}</td>
-                <td>{s.phone}</td>
-                <td>{s.attendance}%</td>
-                <td><Badge>{s.fees}</Badge></td>
-                <td><ProgressBar value={s.performance} /></td>
-                <td><Badge>{s.status}</Badge></td>
+                <td>{s.cls || "—"}</td>
+                <td>{s.parent || "—"}</td>
+                <td>{s.phone || "—"}</td>
+                <td>{Number(s.attendance) || 0}%</td>
+                <td><Badge>{s.fees || "Not recorded"}</Badge></td>
+                <td><ProgressBar value={Number(s.performance) || 0} /></td>
+                <td><Badge>{s.status || "Unspecified"}</Badge></td>
                 <td>
                   {iconBtn("Eye", "View", s.name, `Viewing ${s.name}`)}{" "}
                   {iconBtn("Pencil", "Edit", s.name, `Editing ${s.name}`)}{" "}
@@ -58,9 +60,10 @@ export default function StudentsTable({ title = "Recent students", limit }) {
             ))}
           </tbody>
         </table>
-        {rows.length === 0 && <EmptyState title="No students found" text={`Nothing matches "${query}". Try a different name.`} />}
+        {!loading && !error && rows.length === 0 && students.length > 0 && <EmptyState title="No students found" text={`Nothing matches "${query}". Try a different name.`} />}
       </div>
-      <Pagination shown={`1–${rows.length}`} total="1,248" />
+      <ApiStatus loading={loading} error={error} empty={!students.length} onRetry={reload} />
+      <Pagination shown={rows.length ? `1–${rows.length}` : "0"} total={students.length} />
     </Card>
   );
 }

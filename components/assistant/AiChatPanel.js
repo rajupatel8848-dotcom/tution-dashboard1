@@ -1,10 +1,13 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/ui/Icon";
-import { SUGGESTED_PROMPTS } from "@/data/assistant";
-import { answer } from "@/lib/assistant";
+import { apiRequest } from "@/components/api/client";
 
-const WELCOME = { role: "bot", text: "Hi! I can pull up attendance, fees and performance. Try a suggestion below." };
+const WELCOME = { role: "bot", text: "Hi! I can look up recorded students, teachers, today's absences and unpaid fees." };
+const SUGGESTED_PROMPTS = [
+  "How many students are absent today?", "Show pending fees.", "How many students are registered?",
+  "How many teachers are registered?",
+];
 
 export default function AiChatPanel() {
   const [open, setOpen] = useState(false);
@@ -22,15 +25,22 @@ export default function AiChatPanel() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const send = (text) => {
+  const send = async (text) => {
     if (!text.trim()) return;
     setMessages((m) => [...m, { role: "me", text }]);
     setDraft("");
     setTyping(true);
-    setTimeout(() => {
+    try {
+      const response = await apiRequest("/api/assistant", {
+        method: "POST",
+        body: JSON.stringify({ question: text }),
+      });
+      setMessages((m) => [...m, { role: "bot", text: response.text }]);
+    } catch (error) {
+      setMessages((m) => [...m, { role: "bot", text: error.message }]);
+    } finally {
       setTyping(false);
-      setMessages((m) => [...m, { role: "bot", text: answer(text) }]);
-    }, 700);
+    }
   };
 
   return (
