@@ -849,7 +849,7 @@ function readInput(msg) {
 }
 
 async function handleMessage(phone, msg) {
-  await markRead(msg.id); // blue ticks, so people know we've seen their message
+  void markRead(msg.id); // A slow read receipt must not delay the actual reply.
   const parsedInput = readInput(msg);
   const input = parsedInput || { text: `Unsupported ${msg.type || "unknown"} message`, id: null };
   let status = "Enquiry";
